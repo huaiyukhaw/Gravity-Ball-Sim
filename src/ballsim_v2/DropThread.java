@@ -3,12 +3,16 @@ package ballsim_v2;
 import java.awt.Point;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 
 public class DropThread extends Thread {
+
     private final double PERCENT_ENERGY_LOST_BOUNCE = 0.8;
     private final double HEIGHT_METERS = 8;
     private final double EARTH_GRAVITY = 9.8;
     private final double WINDOW_HEIGHT = 420;
+    private final double WINDOW_HEIGHT_OFFSET = 98;
+    private final double WINDOW_WIDTH_OFFSET = 73;
     private final double PX_PER_SEC2_Y = EARTH_GRAVITY * WINDOW_HEIGHT / HEIGHT_METERS; //m/s^2 * px / m
     private final double DECELERATION_DUE_TO_FRICTION = 200; //deceleration when x friction is applied
     private double xDeceleration = 0; //the active amount of x
@@ -16,12 +20,14 @@ public class DropThread extends Thread {
     private Timer time = new Timer();
     private boolean isDropping = true;
     private double initialXVelocity, initialYVelocity;
+    private JFrame window;
 
-    public DropThread(Painter paint, double initialXVelocity, double initialYVelocity) {
+    public DropThread(Painter paint, double initialXVelocity, double initialYVelocity, JFrame window) {
         isDropping = true;
         this.paint = paint;
         this.initialXVelocity = initialXVelocity;
         this.initialYVelocity = initialYVelocity;
+        this.window = window;
     }
 
     public void run() {
@@ -36,43 +42,42 @@ public class DropThread extends Thread {
             xPos = (int) Math.round(startPosition.x + initialXVelocity * time.getSec() + frictionDirection * 0.5 * xDeceleration * time.getSec() * time.getSec()); //same as above. Accleration is 0 except when friction
             paint.setBallLoc(xPos, yPos);
             paint.repaint();
-            
+
             //-----bounce X------
             if (paint.getBallLoc().x < 0) { //left bounce
                 paint.setBallLoc(0, paint.getBallLoc().y);
                 initialXVelocity = -PERCENT_ENERGY_LOST_BOUNCE * (initialXVelocity + frictionDirection * xDeceleration * time.getSec()); //bounce velocity
                 initialYVelocity = (initialYVelocity + PX_PER_SEC2_Y * time.getSec()); //update y for time drop
                 startPosition = (Point) paint.getBallLoc().clone();
-                time.reset(); 
-            } else if (paint.getBallLoc().x > 342) { //right bounce
-                paint.setBallLoc(342, paint.getBallLoc().y);
+                time.reset();
+            } else if (paint.getBallLoc().x > window.getWidth() - WINDOW_WIDTH_OFFSET) { //right bounce
+                paint.setBallLoc((int)(window.getWidth() - WINDOW_WIDTH_OFFSET), paint.getBallLoc().y); //342
                 initialXVelocity = -PERCENT_ENERGY_LOST_BOUNCE * (initialXVelocity + frictionDirection * xDeceleration * time.getSec());
                 initialYVelocity = (initialYVelocity + PX_PER_SEC2_Y * time.getSec());
                 startPosition = (Point) paint.getBallLoc().clone();
-                time.reset(); 
+                time.reset();
             }
             //-----bounce Y-----//
-            if (paint.getBallLoc().y >= 420) { //bottom bounce
-                paint.setBallLoc(paint.getBallLoc().x, 420);
-                initialYVelocity = -PERCENT_ENERGY_LOST_BOUNCE *(initialYVelocity + PX_PER_SEC2_Y * time.getSec()); //v = v0 + at
+            if (paint.getBallLoc().y >= window.getHeight() - WINDOW_HEIGHT_OFFSET) { //bottom bounce
+                paint.setBallLoc(paint.getBallLoc().x, (int)(window.getHeight() - WINDOW_HEIGHT_OFFSET)); //420
+                initialYVelocity = -PERCENT_ENERGY_LOST_BOUNCE * (initialYVelocity + PX_PER_SEC2_Y * time.getSec()); //v = v0 + at
                 initialXVelocity = initialXVelocity + frictionDirection * xDeceleration * time.getSec();
                 //----start over gravity falling time------
                 startPosition = (Point) paint.getBallLoc().clone();
-                time.reset(); 
+                time.reset();
                 //isDropping = false;
-            } 
-            if (Math.abs(initialYVelocity) < 5 && paint.getBallLoc().y > 419){ //done bouncing
+            }
+            if (Math.abs(initialYVelocity) < 5 && paint.getBallLoc().y > window.getHeight() - WINDOW_HEIGHT_OFFSET - 1) { //done bouncing
                 xDeceleration = DECELERATION_DUE_TO_FRICTION;
             } else {
                 xDeceleration = 0;
             }
-            if (Math.abs(initialYVelocity) < 5 && Math.abs(initialXVelocity) < 5 && paint.getBallLoc().y > 419){ //if its not moving on the bottom
+            if (Math.abs(initialYVelocity) < 5 && Math.abs(initialXVelocity) < 5 && paint.getBallLoc().y > window.getHeight() - WINDOW_HEIGHT_OFFSET - 1) { //if its not moving on the bottom
                 isDropping = false;
             }
-            System.out.println(xDeceleration);
-           // System.out.println(initialYVelocity);
-             //xDeceleration = (paint.getBallLoc().y >= 419) ? DECELERATION_DUE_TO_FRICTION : 0; //turn friction on and off based on y position
-             
+            //System.out.println(xDeceleration);
+            // System.out.println(initialYVelocity);
+            //xDeceleration = (paint.getBallLoc().y >= 419) ? DECELERATION_DUE_TO_FRICTION : 0; //turn friction on and off based on y position
             paint.repaint();
             //---processor rest-----
             try {

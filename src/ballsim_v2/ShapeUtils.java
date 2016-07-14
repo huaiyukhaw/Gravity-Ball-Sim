@@ -12,22 +12,20 @@ public class ShapeUtils {
         }
         return false;
     }
-    
-    public static boolean isPtInCircle(Point ptIn, Point cirUpperLeft, int cirWidth, int cirHeight){
+
+    public static boolean isPtInCircle(Point ptIn, Point cirUpperLeft, int cirWidth, int cirHeight) {
         Point ptCenter = squareUpperLeftToCenterPt(cirUpperLeft, cirWidth, cirHeight);
         double radius = cirWidth / 2;
-        if (distanceFormulua(ptIn, ptCenter) <= radius){
-            return true;
-        }
-        return false;
+        System.out.println((distanceFormulua(ptIn, ptCenter)));
+        return (distanceFormulua(ptIn, ptCenter) <= radius);
     }
-    
-    public static boolean isPtInCircle(Point ptIn, Point cirUpperLeft, Point cirSize){ //overload for point as size
+
+    public static boolean isPtInCircle(Point ptIn, Point cirUpperLeft, Point cirSize) { //overload for point as size
         return isPtInCircle(ptIn, cirUpperLeft, cirSize.x, cirSize.y);
     }
-    
-    private static double distanceFormulua (Point pt1, Point pt2){
-        return Math.sqrt(Math.pow(pt2.x-pt1.x, 2) + Math.pow(pt2.y - pt1.y, 2));
+
+    private static double distanceFormulua(Point pt1, Point pt2) {
+        return Math.sqrt(Math.pow(pt2.x - pt1.x, 2) + Math.pow(pt2.y - pt1.y, 2));
     }
 
     public static Point squareUpperLeftToCenterPt(Point upperLeft, int width, int height) {
