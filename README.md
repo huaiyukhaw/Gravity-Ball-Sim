@@ -6,3 +6,7 @@
   It is the second version of the project and all of the features have not been fully 
 added back in yet. Currently the program is set to emulate a total height of 8 meters with earth gravity. Later options will be added
 to adjust this, along with velocity displays and graphs. 
+
+UPDATE: 7/14/16
+
+The window is now resizable and the ball bounces/falls off of the new dimensions accordingly. There are still a few bugs. 
