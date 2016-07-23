@@ -15,8 +15,10 @@ public class Listener implements MouseListener, MouseMotionListener, ComponentLi
     private boolean isHolding = false; //if you are clicked and holding on the ball
     private Point delta = new Point(0, 0);
     private DropThread dropThread;
-    private Timer time = new Timer();
+    private Timer mouseTime = new Timer();
+    private Timer sizeTime = new Timer();
     private Point prevLocation;
+    private int prevWidth = 0, prevHeight = 0;
     private double mouseXVelocity, mouseYVelocity;
     private final double WINDOW_HEIGHT_OFFSET = 98;
     private final double WINDOW_WIDTH_OFFSET = 73;
@@ -72,11 +74,11 @@ public class Listener implements MouseListener, MouseMotionListener, ComponentLi
         if (prevLocation == null) {
             prevLocation = (Point) mouseLoc.clone();
         }
-        time.stop();
+        mouseTime.stop();
 
-        if (time.getSec() > 0) { //divide by 0 protect
-            mouseXVelocity = (double) (mouseLoc.x - prevLocation.x) / time.getSec();
-            mouseYVelocity = (double) (mouseLoc.y - prevLocation.y) / time.getSec();
+        if (mouseTime.getSec() > 0) { //divide by 0 protect
+            mouseXVelocity = (double) (mouseLoc.x - prevLocation.x) / mouseTime.getSec();
+            mouseYVelocity = (double) (mouseLoc.y - prevLocation.y) / mouseTime.getSec();
         }
 
         if (isHolding) {
@@ -93,8 +95,8 @@ public class Listener implements MouseListener, MouseMotionListener, ComponentLi
             paint.repaint();
         }
         prevLocation = (Point) mouseLoc.clone();
-        time.reset();
-        time.start();
+        mouseTime.reset();
+        mouseTime.start();
     }
 
     @Override
@@ -103,10 +105,30 @@ public class Listener implements MouseListener, MouseMotionListener, ComponentLi
 
     @Override
     public void componentResized(ComponentEvent ce) {
-        if (!dropThread.isAlive()) {
-            dropThread = new DropThread(paint, mouseXVelocity, mouseYVelocity, paint.getWindow());
-            dropThread.start();
+        //---init---
+        if (prevHeight == 0 || prevWidth == 0) {
+            prevHeight = window.getHeight();
+            prevWidth = window.getWidth();
         }
+        sizeTime.stop();
+        double resizeXVelocity = 0, resizeYVelocity = 0;
+        if (sizeTime.getSec() > 0) { //divide by 0 protect
+            resizeXVelocity = (double) (window.getWidth() - prevWidth) / sizeTime.getSec();
+            resizeYVelocity = (double) (window.getHeight() - prevHeight) / sizeTime.getSec();
+        }
+        
+        if (!dropThread.isAlive()) {
+            System.out.println("    NEW");
+            dropThread = new DropThread(paint, 0, resizeYVelocity, paint.getWindow());//mouse cant be moving ball
+            dropThread.start();
+        } else {
+            dropThread.setResizeVelocity(resizeXVelocity, resizeYVelocity);
+        }
+
+        prevHeight = window.getHeight();
+        prevWidth = window.getWidth();
+        sizeTime.reset();
+        sizeTime.start();
     }
 
     @Override

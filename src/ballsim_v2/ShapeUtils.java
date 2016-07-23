@@ -16,7 +16,6 @@ public class ShapeUtils {
     public static boolean isPtInCircle(Point ptIn, Point cirUpperLeft, int cirWidth, int cirHeight) {
         Point ptCenter = squareUpperLeftToCenterPt(cirUpperLeft, cirWidth, cirHeight);
         double radius = cirWidth / 2;
-        System.out.println((distanceFormulua(ptIn, ptCenter)));
         return (distanceFormulua(ptIn, ptCenter) <= radius);
     }
 
