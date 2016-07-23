@@ -20,8 +20,14 @@ public class Painter extends JComponent {
     
     public void paintComponent(Graphics g) {
         //------gfx back buffer image for smoother graphics----
-        Image backBuffer = createImage(window.getWidth(), window.getHeight());
-        Graphics2D g2 = (Graphics2D) backBuffer.getGraphics();
+        
+        /*removed back buffer for optimization. only drawing one object (the ball)
+          so it doesnt make sense to render seperate frames.
+          7/23/16               
+        */
+        
+       // Image backBuffer = createImage(window.getWidth(), window.getHeight());
+        Graphics2D g2 = (Graphics2D) g;//backBuffer.getGraphics();
          
         //---background--------
         g2.setColor(Color.black);
@@ -31,7 +37,7 @@ public class Painter extends JComponent {
         g2.setColor(Color.red);
         g2.fillOval(ballPt.x, ballPt.y, ballSize.x, ballSize.y);
                 
-        g.drawImage(backBuffer, 0, 0, this); //update screen
+        //g.drawImage(backBuffer, 0, 0, this); //update screen
     }
     
     public void setBallLoc(Point in){
