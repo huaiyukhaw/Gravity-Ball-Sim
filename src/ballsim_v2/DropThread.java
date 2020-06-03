@@ -69,6 +69,15 @@ public class DropThread extends Thread {
                 time.reset();
                 //isDropping = false;
             }
+            else if (paint.getBallLoc().y <0) { //top bounce
+                paint.setBallLoc(paint.getBallLoc().x, 0); //420
+                initialYVelocity = -PERCENT_ENERGY_LOST_BOUNCE * (initialYVelocity + PX_PER_SEC2_Y * time.getSec()) + resizeYVelocity; //v = v0 + at
+                initialXVelocity = initialXVelocity + frictionDirection * xDeceleration * time.getSec();
+                //----start over gravity falling time------
+                startPosition = (Point) paint.getBallLoc().clone();
+                time.reset();
+                //isDropping = false;
+            }
             //---reset resize velocity after one pass---
             resizeXVelocity = 0;
             resizeYVelocity = 0;
