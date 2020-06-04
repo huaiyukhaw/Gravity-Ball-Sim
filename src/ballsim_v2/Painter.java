@@ -13,6 +13,8 @@ public class Painter extends JComponent {
     private Point ballPt = new Point(175, 402);
     private Point ballSize = new Point(50,50);
     private String labelHeight = "";
+    private String labelVelocity = "";
+    private String labelPosition = "";
     private String labelEnergyLost = "";
     private String labelCumulativeEnergyLost = "";
     private JFrame window;
@@ -45,10 +47,20 @@ public class Painter extends JComponent {
         g2.drawString(labelHeight, 20, 30);
         g2.drawString(labelEnergyLost, 20, 50);
         g2.drawString(labelCumulativeEnergyLost, 20, 70);
+        g2.drawString(labelVelocity, 20, 90);
+        g2.drawString(labelPosition, 20, 110);
     }
 
     public void setLabelHeight(Double label) {
         labelHeight = "Height: " + label + " metres";
+    }
+
+    public void setLabelVelocity(Double label) {
+        labelVelocity = "Velocity: " + label + " m/s";
+    }
+
+    public void setLabelPosition(String label) {
+        labelPosition = "Position: " + label;
     }
 
     public void setLabelEnergyLost(Double string) {
