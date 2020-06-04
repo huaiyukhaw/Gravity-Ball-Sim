@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 public class DropThread extends Thread {
 
     private final double PERCENT_ENERGY_LOST_BOUNCE = 0.8;
+    private final double RATIO_OF_PIXEL_TO_HEIGHT = 0.01;
     private final double HEIGHT_METERS = 8;
     private final double EARTH_GRAVITY = 9.8;
     private final double WINDOW_HEIGHT = 420;
@@ -17,6 +18,8 @@ public class DropThread extends Thread {
     private final double DECELERATION_DUE_TO_FRICTION = 200; //deceleration when x friction is applied
     private double xDeceleration = 0; //the active amount of x
     private double resizeXVelocity = 0, resizeYVelocity = 0;
+    private double energyLost = 0;
+    private double cumulativeEnergyLost = 0;
     private Painter paint;
     private Timer time = new Timer();
     private boolean isDropping = true;
@@ -51,12 +54,22 @@ public class DropThread extends Thread {
                 initialXVelocity = -PERCENT_ENERGY_LOST_BOUNCE * (initialXVelocity + frictionDirection * xDeceleration * time.getSec()); //bounce velocity
                 initialYVelocity = (initialYVelocity + PX_PER_SEC2_Y * time.getSec()); //update y for time drop
                 startPosition = (Point) paint.getBallLoc().clone();
+                energyLost = pixelToMetre((1 - PERCENT_ENERGY_LOST_BOUNCE) / PERCENT_ENERGY_LOST_BOUNCE * Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(initialYVelocity, 2)));
+                cumulativeEnergyLost = cumulativeEnergyLost + energyLost;
+                paint.setLabelEnergyLost((Math.round(energyLost * 10000.0) / 10000.0));
+                paint.setLabelCumulativeEnergyLost((Math.round(cumulativeEnergyLost * 10000.0) / 10000.0));
+                // paint.setBallSize(new Point(25,50));
                 time.reset();
             } else if (paint.getBallLoc().x > window.getWidth() - WINDOW_WIDTH_OFFSET) { //right bounce
                 paint.setBallLoc((int) (window.getWidth() - WINDOW_WIDTH_OFFSET), paint.getBallLoc().y); //342
                 initialXVelocity = -PERCENT_ENERGY_LOST_BOUNCE * (initialXVelocity + frictionDirection * xDeceleration * time.getSec());
                 initialYVelocity = (initialYVelocity + PX_PER_SEC2_Y * time.getSec());
                 startPosition = (Point) paint.getBallLoc().clone();
+                energyLost = pixelToMetre((1 - PERCENT_ENERGY_LOST_BOUNCE) / PERCENT_ENERGY_LOST_BOUNCE * Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(initialYVelocity, 2)));
+                cumulativeEnergyLost = cumulativeEnergyLost + energyLost;
+                paint.setLabelEnergyLost((Math.round(energyLost * 10000.0) / 10000.0));
+                paint.setLabelCumulativeEnergyLost((Math.round(cumulativeEnergyLost * 10000.0) / 10000.0));
+                // paint.setBallSize(new Point(25,50));
                 time.reset();
             }
             //-----bounce Y-----//
@@ -66,6 +79,11 @@ public class DropThread extends Thread {
                 initialXVelocity = initialXVelocity + frictionDirection * xDeceleration * time.getSec();
                 //----start over gravity falling time------
                 startPosition = (Point) paint.getBallLoc().clone();
+                energyLost = pixelToMetre((1 - PERCENT_ENERGY_LOST_BOUNCE) / PERCENT_ENERGY_LOST_BOUNCE * Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(initialYVelocity, 2)));
+                cumulativeEnergyLost = cumulativeEnergyLost + energyLost;
+                paint.setLabelEnergyLost((Math.round(energyLost * 10000.0) / 10000.0));
+                paint.setLabelCumulativeEnergyLost((Math.round(cumulativeEnergyLost * 10000.0) / 10000.0));
+                // paint.setBallSize(new Point(50,25));
                 time.reset();
                 //isDropping = false;
             }
@@ -75,6 +93,11 @@ public class DropThread extends Thread {
                 initialXVelocity = initialXVelocity + frictionDirection * xDeceleration * time.getSec();
                 //----start over gravity falling time------
                 startPosition = (Point) paint.getBallLoc().clone();
+                energyLost = pixelToMetre((1 - PERCENT_ENERGY_LOST_BOUNCE) / PERCENT_ENERGY_LOST_BOUNCE * Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(initialYVelocity, 2)));
+                cumulativeEnergyLost = cumulativeEnergyLost + energyLost;
+                paint.setLabelEnergyLost((Math.round(energyLost * 10000.0) / 10000.0));
+                paint.setLabelCumulativeEnergyLost((Math.round(cumulativeEnergyLost * 10000.0) / 10000.0));
+                // paint.setBallSize(new Point(50,25));
                 time.reset();
                 //isDropping = false;
             }
@@ -93,7 +116,9 @@ public class DropThread extends Thread {
             if (Math.abs(initialYVelocity) < 5 && Math.abs(initialXVelocity) < 5 && paint.getBallLoc().y > window.getHeight() - WINDOW_HEIGHT_OFFSET - 1) { //if its not moving on the bottom
                 isDropping = false;
             }
-
+             
+            // paint.setBallSize(new Point(50,50));
+            paint.setLabelHeight((Math.round((pixelToMetre(window.getHeight() - paint.getBallLoc().y - paint.getBallSize().y)) * 10000.0) / 10000.0));
             paint.repaint();
 
             //---processor rest-----
@@ -103,6 +128,7 @@ public class DropThread extends Thread {
                 Logger.getLogger(DropThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
         System.out.println("                        EXIT THREAD");
     }
 
@@ -124,5 +150,10 @@ public class DropThread extends Thread {
         } else { //logrithmic scaling
             return sign * (212.53 * Math.log(vel) - 941.32); //equation from excel
         }
+    }
+
+    //convert from px per sec to metre per sec
+    private double pixelToMetre(double pixel) {
+        return RATIO_OF_PIXEL_TO_HEIGHT * pixel;
     }
 }

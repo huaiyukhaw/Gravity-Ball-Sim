@@ -93,6 +93,7 @@ public class Listener implements MouseListener, MouseMotionListener, ComponentLi
                 paint.setBallLoc(paint.getBallLoc().x, (int) (window.getHeight() - WINDOW_HEIGHT_OFFSET));
             }
             paint.repaint();
+            paint.setLabelHeight((Math.round((0.01 * (window.getHeight() - paint.getBallLoc().y - paint.getBallSize().y)) * 10000.0) / 10000.0));
         }
         prevLocation = (Point) mouseLoc.clone();
         mouseTime.reset();

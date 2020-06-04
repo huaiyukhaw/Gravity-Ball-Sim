@@ -12,6 +12,9 @@ public class Painter extends JComponent {
     
     private Point ballPt = new Point(175, 402);
     private Point ballSize = new Point(50,50);
+    private String labelHeight = "";
+    private String labelEnergyLost = "";
+    private String labelCumulativeEnergyLost = "";
     private JFrame window;
     
     public Painter(JFrame window) {
@@ -38,8 +41,24 @@ public class Painter extends JComponent {
         g2.fillOval(ballPt.x, ballPt.y, ballSize.x, ballSize.y);
                 
         //g.drawImage(backBuffer, 0, 0, this); //update screen
+        g2.setColor(Color.white);
+        g2.drawString(labelHeight, 20, 30);
+        g2.drawString(labelEnergyLost, 20, 50);
+        g2.drawString(labelCumulativeEnergyLost, 20, 70);
     }
-    
+
+    public void setLabelHeight(Double label) {
+        labelHeight = "Height: " + label + " metres";
+    }
+
+    public void setLabelEnergyLost(Double string) {
+        labelEnergyLost = "Energy Lost On Last Bounce: " + string + " m/s";
+    }
+
+    public void setLabelCumulativeEnergyLost(Double label) {
+        labelCumulativeEnergyLost = "Cumulative Energy Lost: " + label + " m/s";
+    }
+
     public void setBallLoc(Point in){
         ballPt = in;
     }
